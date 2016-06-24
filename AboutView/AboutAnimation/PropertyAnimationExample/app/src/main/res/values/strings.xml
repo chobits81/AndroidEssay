@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">PropertyAnimationExample</string>
+    <string name="gb_gradient">背景渐变</string>
+    <string name="change_location">改变位置</string>
+</resources>

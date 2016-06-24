@@ -1,0 +1,39 @@
+# Service
+关于Android的Service机制的使用（之前面试被问懵了一个关于Service进行进程间通信的问题，特来复习一下Service的用法）
+## 目录
+- Service应用场景和特性
+- 启动类Service
+- 绑定类Service
+- Service的通信
+
+## 一、Service应用场景和特性
+Service作为Android四大组件之一，其作用是提供一个稳定的后台执行环境，没有与用户进行交互的界面。一般用在需要长时间运行的环境中，即使此时应用并不处于与用户的交互中。比如下载/上传文件，音乐播放，后台检测手机运行状态等。Service和线程有很多相识的地方，给人的印象是两者很相识。一般都是用来执行一些任务。现在就来对比以下：
+- 服务是可以运行在后台的机制，即使用户没有与它进行交互。
+- 服务是高级的单例模式，组件可以反复与之进行绑定、交互；而线程是在脱离了绑定之后是无法重新恢复绑定的。
+- 系统给服务的权限优先于线程。这一点可以重系统在资源紧张时回收的顺序来确定。
+- 服务默认是允许在其托管进程的主线程中的，所以进行耗时任务记得启动工作线程完成。
+
+除非你确定在应用消失后某些任务确实需要继续完成（比如播放音乐），否则使用多线程。
+
+## 二、启动类Service
+Service分为绑定类型和运行类型，这两种可以单独存在或者一起存在。不同的类型决定了其运行的方式。先来讲运行类Service。
+运行类的Service生命周期大致是这样的：onCreate---onStartCommand---onDestory，其中,onCreate会在第一个startService调用后执行来完成Service的初始化工作，然后执行onStartCommand来执行指向Intent对象传过来的任务，之后就处于运行状态，等待下一个startService调用，需要注意的是Service是单例模式，所以第二个调用startService并不会执行onCreate，而是直接执行OnstartCommand，除非两次startService期间Service自己调用了stopSelf或者其他组件调用了stopService。
+运行类Service一般拓展与两个类，IntentService或者Service，前者实际也是Service的子类，只是它把任务的完成指派到一个工作线程了，拓展这个类只需要重写onHandleIntent来处理实际任务，记住它不是并行处理任务的，它是逐一处理请求，基于队列。相比来说继承Service就显得灵活多了，如果你有需求，你可以为每个请求开启一个线程来并行处理任务，为了处理启动服务请求，你需要做的有两点：
+1. 重写onBind并返回null，这个方法与绑定型Service有关。
+2. 重写onStartCommand来处理每个启动型请求。
+
+必要时重写onCreate，onDestory来完成Service的创建和回收。
+
+## 三、绑定类Service
+启动型Servie应用在需要和Service进行交互的场景中（其实通过别的机制，也可以和启动项Service进行交互，但这里说的是直接的交互），交互的场景有可以分为同一进程中或是不同进程间。后者可以实现IPC（也是那天被问蒙的地方）。
+先说同一进程的情形下怎么实现绑定型Service，拓展Binder类，实现自己Ibinder对象，并在该对象中封装访问Service中公共方法的途径（一般直接返回Sercvice的实例），记得是从onBind中返回实例。
+不同进程间通过Service进行通信：使用messenger，具体过程如下：
+- 创建一个Handelr来处理实际的回调
+- 用上面创建的handler创建一个messenger对象
+- messenger调用getBinder返回IBinder对象
+- 启动进程在ServiceConnection对象中用Ibinder创建messenger对象
+- messager对象发生Message进而完成IPC通信，发送的message处理地点是第一步创建Handelr指定的handleMessage方法中。
+其实还有一种方法使用Service来实现IPC，AIDL（Android Interface Define Language），它可以灵活实现跨进程通信，比如多线程处理（Messenger是基于队列的处理方式。），感觉大多数场景用不上，就没怎么了解，等要用时在看文档吧！
+
+## Service通信
+启动型Sevice不能直接返回结果或者被启动组件超控，所以得通过别的方式去进行通信。常见的是通过广播进行通信，可以使用普通广播，或者把要广播的内容封装成PendingIntent然后在需要发送的地方发送出去。常见的应用场景是，你启动一个Service下载自己的更新包，下载完成后发送一个应用内广播通知自己下载完成了，等待后续处理。

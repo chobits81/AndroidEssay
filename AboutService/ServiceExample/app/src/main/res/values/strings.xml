@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">AboutService</string>
+    <string name="intent_service">Intent Service</string>
+    <string name="custom_service">Custom Service</string>
+</resources>
