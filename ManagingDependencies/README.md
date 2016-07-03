@@ -79,7 +79,7 @@ Ivy配置类似，只要把maven改成ivy就行了，再次申明为了将影响
   include ':app', ':volley'
 ```
 经过这个步骤，就就可以在项目导航的Android视图下看到导入的项目了
-![modules](./pic/chapter2-1.JPG)
+![modules](./pic/chapter2-1.JPG)<br>
 其中app是Android生成的application module，volley是我导入的library module。但这只是告诉了Gradle去管理者两个module，并不能再app中应用volley中的API，需要完成下面一个步骤才能使用。
 - 添加dependencies声明
 ```Java
@@ -101,10 +101,10 @@ library module:
 
 ## 三、arr文件依赖
 arr文件是打包好的library module，在说明如何将aar文件引入到项目中，先说说如何打包module生成aar文件,Build->Make Module (module name)等Gradle构件完成后，会在下图所示的路径中生成aar文件
-![aar](./pic/chapter2-2.JPG)
+![aar](./pic/chapter2-2.JPG)<br>
 开始讲如何将aar文件加入到项目中,同样需要三个步骤：
 - 拷贝aar文件到module目录下，可以拷贝到libs文件中，或者任何新建的文件夹中
-![aars](./pic/chapter2-3.JPG)
+![aars](./pic/chapter2-3.JPG)<br>
 我这里新建了一个叫aars的文件夹，然后把之前生成的aar文件放了进去
 - 添加文件仓库
 在module的build.gradle中添加代码块
