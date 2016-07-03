@@ -132,4 +132,4 @@ Android Studo文件依赖很简单，把jar包往libs文件里一放就ok了。�
  这句话就是将libs目录下所有的jar包一次全倒过来。如果换成compile file(jar文件路径)可以一次只导入一个jar包。
 
 # 五、例子完整代码
-[Github-fallblank](https://github.com/fallblank)
+[Github-fallblank](https://github.com/fallblank/AndroidEssay/tree/master/ManagingDependencies)
